@@ -30,6 +30,10 @@ module.exports = {
         async createPost(_, { body }, context) {
             const user = checkAuth(context);
 
+            if (args.body.trim() === '') {
+                throw new Error('Post body must not be empty');
+            }
+
             const newPost = new Post({
                 body,
                 user: user.id,
@@ -55,25 +59,25 @@ module.exports = {
                 throw new Error(err);
             }
         },
-        async likePost(_, {postId}, context ) {
-            const {username} = checkAuth(context)
+        async likePost(_, { postId }, context) {
+            const { username } = checkAuth(context);
 
-            const post = await Post,findById(postId)
+            const post = await Post.findById(postId);
 
-            if(post) {
-                if(post.likes.find(like => like.username === username)) {
-                    post.likes = post.likes.filter(like => like.username !== username)
-                    await post.save()
+            if (post) {
+                if (post.likes.find((like) => like.username === username)) {
+                    post.likes = post.likes.filter((like) => like.username !== username);
+                    await post.save();
                 } else {
                     post.likes.push({
                         username,
-                        createdAt: new Date().toISOString()
-                    })
+                        createdAt: new Date().toISOString(),
+                    });
                 }
 
-                await post.save()
-                return post
-            } else throw new UserInputError("Post not found")
-        }
+                await post.save();
+                return post;
+            } else throw new UserInputError('Post not found');
+        },
     },
 };
